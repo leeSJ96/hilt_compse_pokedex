@@ -2,8 +2,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.kotlinAndroidKsp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pokedex"
-        minSdk = 33
+        minSdk = 32
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -69,14 +69,20 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+//    implementation ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
+////    implementation(libs.hilt.android)
+////    ksp(libs.hilt.compiler)
+//    implementation("com.google.dagger:hilt-android:2.44")
+//    kapt("com.google.dagger:hilt-android-compiler:2.44")
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.8.1")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
-    implementation ("com.google.code.gson:gson:2.8.8")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.8.1")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 }

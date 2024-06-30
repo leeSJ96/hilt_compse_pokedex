@@ -1,11 +1,57 @@
 package com.plcoding.jetpackcomposepokedex.data.remote.responses
 
 
+import android.os.Parcel
+import android.os.Parcelable
+import androidx.annotation.Keep
+import com.example.pokedex.PokeData
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class PokemonList(
+    @SerializedName("pokemonName")
+    val pokemonName: String?,
+    @SerializedName("count")
     val count: Int,
-    val next: String,
-    val previous: Any,
-    val results: List<Result>
+    @SerializedName("next")
+    val next: String?,
+    @SerializedName("previous")
+    val previous: Any?,
+    @SerializedName("results")
+    val results: ArrayList<Result>
+
 )
+
+//    : Parcelable {
+//    constructor(parcel: Parcel) : this(
+//        parcel.readString(),
+//        parcel.readInt(),
+//        parcel.readString(),
+//        parcel.readValue(Result::class.java.classLoader),
+//        parcel.readArrayList(Result::class.java.classLoader) as ArrayList<Result>,
+//    ) {
+//    }
+//
+//    override fun writeToParcel(parcel: Parcel, flags: Int) {
+//        parcel.writeString(pokemonName)
+//        parcel.writeInt(count)
+//        parcel.writeString(next)
+//        parcel.writeValue(previous)
+//
+//    }
+//
+//    override fun describeContents(): Int {
+//        return 0
+//    }
+//
+//    companion object CREATOR : Parcelable.Creator<PokeData> {
+//        override fun createFromParcel(parcel: Parcel): PokeData {
+//            return PokeData(parcel)
+//        }
+//
+//        override fun newArray(size: Int): Array<PokeData?> {
+//            return arrayOfNulls(size)
+//        }
+//    }
+//
+//}
