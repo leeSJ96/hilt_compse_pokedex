@@ -2,7 +2,9 @@ package com.example.pokedex
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.Keep
 
+@Keep
 data class PokeData(var pokemonName:String,
                     var number:Int,
                     var imageUrl:String,

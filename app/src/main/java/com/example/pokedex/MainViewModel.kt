@@ -1,11 +1,15 @@
 package com.example.pokedex
 
 import android.nfc.tech.MifareUltralight.PAGE_SIZE
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokedex.util.Resource
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -17,53 +21,45 @@ class MainViewModel @Inject constructor(
 
     private var curPage = 0
 
-    var pokemonList = mutableStateOf<List<PokeData>>(listOf())
-    var loadError = mutableStateOf("")
-    var endReached = mutableStateOf(false)
-    var isLoading = mutableStateOf(false)
+    val pokemonsState = MutableStateFlow(
+        ViewState(
+            Status.LOADING,
+            PokemonList(0,"","", arrayListOf()), ""
+        )
+    )
+
+
     init {
-        loadPokemonPaginated()
+        fetchPokemons()
     }
 
 
-    fun loadPokemonPaginated(){
+    fun fetchDataByOffset(offset: Int) {
+        pokemonsState.value = ViewState.loading()
         viewModelScope.launch {
-            val result = repository.getPokeList(PAGE_SIZE, curPage * PAGE_SIZE)
-            when(result) {
-                is Resource.Success -> {
-                    endReached.value = curPage * PAGE_SIZE >= result.data!!.count
-                    val pokedexEntries = result.data.results.mapIndexed { index, entry ->
-                        val number = if(entry.url.endsWith("/")) {
-                            entry.url.dropLast(1).takeLastWhile { it.isDigit() }
-                        } else {
-                            entry.url.takeLastWhile { it.isDigit() }
-                        }
-                        val url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png"
-                        PokeData(entry.name.capitalize(Locale.KOREA),  number.toInt(),url)
-                    }
-                    curPage++
 
-                    loadError.value = ""
-                    isLoading.value = false
-                    pokemonList.value += pokedexEntries
+            repository.fetchPokemonsByOffset(offset)
+                .catch {
+                    pokemonsState.value = ViewState.error(it.message.toString())
                 }
-                is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                .collect { pokemonsResponseViewState ->
+                    pokemonsState.value = ViewState.success(pokemonsResponseViewState.data)
                 }
-
-                null -> TODO()
-            }
-
         }
     }
-//    fun calcDominantColor(drawable: Drawable, onFinish: (Color) -> Unit) {
-//        val bmp = (drawable as BitmapDrawable).bitmap.copy(Bitmap.Config.ARGB_8888, true)
-//
-//        Palette.from(bmp).generate { palette ->
-//            palette?.dominantSwatch?.rgb?.let { colorValue ->
-//                onFinish(Color(colorValue))
-//            }
-//        }
-//    }
+    fun fetchPokemons() {
+        pokemonsState.value = ViewState.loading()
+        viewModelScope.launch {
+
+            repository.fetchPokemonData()
+                .catch {
+                    pokemonsState.value = ViewState.error(it.message.toString())
+                    Log.d("포켓몬 에러", it.message.toString())
+                }
+                .collect {
+                    pokemonsState.value = ViewState.success(it.data)
+
+                }
+        }
+    }
 }
