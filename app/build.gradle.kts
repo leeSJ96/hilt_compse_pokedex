@@ -30,6 +30,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+
         }
 
     }
@@ -80,19 +82,27 @@ dependencies {
 //    implementation("com.google.dagger:hilt-android:2.44")
 //    kapt("com.google.dagger:hilt-android-compiler:2.44")
 
+
+
+    //힐트
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    implementation (libs.androidx.activity.ktx)
+    implementation (libs.androidx.fragment.ktx)
 
 
-    implementation(libs.logging.interceptor)
 
+    //통신
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:adapter-rxjava:2.0.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.8.8")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation (libs.androidx.activity.ktx)
-    implementation (libs.androidx.fragment.ktx)
+    implementation(libs.logging.interceptor)
+
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+    implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.1")
 
 }

@@ -1,25 +1,45 @@
 package com.example.pokedex
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.provider.Settings.Global.getString
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
 import com.example.pokedex.ui.theme.PokedexTheme
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.Pokemon
-import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -33,19 +53,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeData()
         viewModel.fetchPokemons()
 
         setContent {
 
             PokedexTheme {
-                val viewModel = hiltViewModel<MainViewModel>()
+
 
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    Greeting(viewModel)
                 }
             }
         }
@@ -58,6 +79,7 @@ class MainActivity : ComponentActivity() {
                     Status.LOADING -> {
 
                     }
+
                     Status.SUCCESS -> {
 
                         it.data?.let { pokeResponse ->
@@ -66,7 +88,9 @@ class MainActivity : ComponentActivity() {
                                     name = singlePokemon.name,
                                     url = singlePokemon.url,
                                 )
+
                             }
+
 //                            if (offset <= 0) {
 //                                binding.apply {
 //                                    btnLeft.isEnabled = false
@@ -74,6 +98,8 @@ class MainActivity : ComponentActivity() {
 //                            } else {
 //                                binding.btnLeft.isEnabled = true
 //                            }
+
+
 //                            binding.recycler.adapter = PokeListAdapter(list) { pokemon ->
 //                                val bundle = bundleOf("name" to pokemon.name)
 //                                view?.findNavController()
@@ -88,7 +114,8 @@ class MainActivity : ComponentActivity() {
 
                     // error occurred status
                     else -> {
-                        Toast.makeText(this@MainActivity, "${it.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "${it.message}", Toast.LENGTH_SHORT)
+                            .show()
                         Log.e("PokeListFragment", it.message.toString())
                     }
                 }
@@ -97,22 +124,73 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun CustomItem(
+    pokemon: com.plcoding.jetpackcomposepokedex.data.remote.responses.Result,
+    modifier: Modifier
+) {
+    Row(
+        modifier = Modifier
+            .background(Color.LightGray)
+            .fillMaxWidth()
+            .padding(24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "${pokemon.name}",
+            color = Color.Black,
+            fontSize = 50.sp,
+            fontWeight = FontWeight.Bold
+        )
+        GlideImage(
+            model = pokemon.url,
+            contentDescription = "loadingImage",
+            modifier = modifier.fillMaxWidth()
+        ) {
+            it.error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_background)
+                .load(pokemon.url)
+        }
+
+
+    }
+}
+
+
+//@Composable
+//@Preview
+//fun CustomItemPreview() {
+//    CustomItem(
+//        result = Result(
+//            name = 0,
+//            src = "John",
+//        )
+//    )
+//}
+
+
+@SuppressLint("StateFlowValueCalledInComposition")
+@Composable
+fun Greeting(viewModel: MainViewModel) {
+    var pokemonList  = viewModel.pokemonsState.value.data?.results
+    Log.d("check pokemonList =", pokemonList.toString())
+    LazyColumn {
+        items(pokemonList?.size?.minus(1) ?: 0) { it ->
+            pokemonList?.get(it)?.let { it1 -> CustomItem(pokemon = it1, modifier = Modifier) }
+        }
+
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     PokedexTheme {
-        Greeting("Android")
+
     }
 }

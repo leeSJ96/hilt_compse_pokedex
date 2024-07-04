@@ -2,11 +2,15 @@ package com.example.pokedex
 
 import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokedex.util.Resource
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -21,12 +25,18 @@ class MainViewModel @Inject constructor(
 
     private var curPage = 0
 
+
     val pokemonsState = MutableStateFlow(
         ViewState(
+
             Status.LOADING,
             PokemonList(0,"","", arrayListOf()), ""
+
         )
     )
+    var pokemons by mutableStateOf(Result)
+
+
 
 
     init {
@@ -58,7 +68,7 @@ class MainViewModel @Inject constructor(
                 }
                 .collect {
                     pokemonsState.value = ViewState.success(it.data)
-
+                    Log.d("포켓몬 data", pokemonsState.value.toString())
                 }
         }
     }

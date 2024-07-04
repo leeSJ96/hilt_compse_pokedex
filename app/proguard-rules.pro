@@ -27,3 +27,8 @@
  # kept. Suspend functions are wrapped in continuations where the type argument
  # is used.
  -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+ -keepattributes *Annotation*
+ -keep class retrofit.** { *; }
+ -keepclasseswithmembers class * {
+ @retrofit.http.* <methods>; }
+ -keepattributes Signature

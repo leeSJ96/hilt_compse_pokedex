@@ -13,9 +13,9 @@ data class PokemonList(
     @SerializedName("next")
     val next: String?,
     @SerializedName("previous")
-    val previous: Any?,
+    val previous: String?,
     @SerializedName("results")
-    val results: ArrayList<Result>
+    val results: List<Result>
 )
 
 //    : Parcelable {
