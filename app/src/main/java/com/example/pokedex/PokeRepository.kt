@@ -18,17 +18,22 @@ class PokeRepository @Inject constructor(
 //       return api.getPokemonList(limit,offset)
 //    }
 
-    suspend fun fetchPokemonData(): Flow<ViewState<PokemonList>> {
-        return flow {
-            val comment = api.getPokemons()
-            emit(ViewState.success(comment))
-        }.flowOn(Dispatchers.IO)
+    suspend fun getPokemonList(limit: Int, offset: Int): Resource<PokemonList> {
+        val response = try {
+            api.getPokemonList(limit, offset)
+        } catch(e: Exception) {
+            return Resource.Error("An unknown error occured.")
+        }
+        return Resource.Success(response)
     }
-    suspend fun fetchPokemonsByOffset(offset: Int): Flow<ViewState<PokemonList>> {
-        return flow {
-            val comment = api.getPokemonList(limit = LIMIT_POKEMONS, offset = offset)
-            emit(ViewState.success(comment))
-        }.flowOn(Dispatchers.IO)
+
+    suspend fun getPokemonInfo(pokemonName: String): Resource<Pokemon> {
+        val response = try {
+            api.getPokemonInfo(pokemonName)
+        } catch(e: Exception) {
+            return Resource.Error("An unknown error occured.")
+        }
+        return Resource.Success(response)
     }
 }
 

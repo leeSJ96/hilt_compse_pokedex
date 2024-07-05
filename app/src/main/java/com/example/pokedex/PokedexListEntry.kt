@@ -5,11 +5,11 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 
 @Keep
-data class PokeData(var pokemonName:String,
-                    var number:Int,
-                    var imageUrl:String,
+data class PokedexListEntry(var pokemonName:String,
+                            var number:Int,
+                            var imageUrl:String,
 
-): Parcelable {
+                            ): Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString()!!,
             parcel.readInt()!!,
@@ -28,12 +28,12 @@ data class PokeData(var pokemonName:String,
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<PokeData> {
-        override fun createFromParcel(parcel: Parcel): PokeData {
-            return PokeData(parcel)
+    companion object CREATOR : Parcelable.Creator<PokedexListEntry> {
+        override fun createFromParcel(parcel: Parcel): PokedexListEntry {
+            return PokedexListEntry(parcel)
         }
 
-        override fun newArray(size: Int): Array<PokeData?> {
+        override fun newArray(size: Int): Array<PokedexListEntry?> {
             return arrayOfNulls(size)
         }
     }

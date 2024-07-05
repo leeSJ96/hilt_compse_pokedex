@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.palette.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,6 +77,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation ("androidx.compose.material:material-icons-core:1.7.0-beta04")
+    implementation ("androidx.compose.material:material-icons-extended:1.7.0-beta04")
+    implementation("androidx.compose.material3:material3-android:1.2.0-rc01")
 //    implementation ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
 ////    implementation(libs.hilt.android)
 ////    ksp(libs.hilt.compiler)
@@ -104,5 +108,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.1")
-
+    //코일
+    implementation ("io.coil-kt:coil:1.1.1")
+    implementation ("com.google.accompanist:accompanist-coil:0.7.0")
 }

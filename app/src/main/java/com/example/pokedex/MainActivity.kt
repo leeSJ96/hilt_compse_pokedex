@@ -10,39 +10,77 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.Center
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusModifier
-import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import coil.request.ImageRequest
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
 import com.example.pokedex.ui.theme.PokedexTheme
+import com.example.pokedex.util.Resource
+import com.google.accompanist.coil.CoilImage
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.Pokemon
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -53,70 +91,42 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observeData()
-        viewModel.fetchPokemons()
 
         setContent {
 
             PokedexTheme {
 
-
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "pokemon_list_screen"
                 ) {
-                    Greeting(viewModel)
-                }
-            }
-        }
-    }
-
-    private fun observeData() {
-        lifecycleScope.launch {
-            viewModel.pokemonsState.collect {
-                when (it.status) {
-                    Status.LOADING -> {
-
+                    composable("pokemon_list_screen") {
+                        PokemonListScreen(navController = navController)
                     }
-
-                    Status.SUCCESS -> {
-
-                        it.data?.let { pokeResponse ->
-                            val list: List<Result> = pokeResponse.results!!.map { singlePokemon ->
-                                Result(
-                                    name = singlePokemon.name,
-                                    url = singlePokemon.url,
-                                )
-
+                    composable(
+                        "pokemon_detail_screen/{dominantColor}/{pokemonName}",
+                        arguments = listOf(
+                            navArgument("dominantColor") {
+                                type = NavType.IntType
+                            },
+                            navArgument("pokemonName") {
+                                type = NavType.StringType
                             }
-
-//                            if (offset <= 0) {
-//                                binding.apply {
-//                                    btnLeft.isEnabled = false
-//                                }
-//                            } else {
-//                                binding.btnLeft.isEnabled = true
-//                            }
-
-
-//                            binding.recycler.adapter = PokeListAdapter(list) { pokemon ->
-//                                val bundle = bundleOf("name" to pokemon.name)
-//                                view?.findNavController()
-//                                    ?.navigate(R.id.action_listFragment_to_detailFragment, bundle)
-//                            }
-                            Log.d("포켓몬", "Received poke list.")
+                        )
+                    ) {
+                        val dominantColor = remember {
+                            val color = it.arguments?.getInt("dominantColor")
+                            color?.let { Color(it) } ?: Color.White
                         }
-                            ?: run {
-                                Log.e("포켓몬", "Error: Failed to fetch poke list.")
-                            }
-                    }
-
-                    // error occurred status
-                    else -> {
-                        Toast.makeText(this@MainActivity, "${it.message}", Toast.LENGTH_SHORT)
-                            .show()
-                        Log.e("PokeListFragment", it.message.toString())
+                        val pokemonName = remember {
+                            it.arguments?.getString("pokemonName")
+                        }
+//                        PokemonDetailScreen(
+//                            dominantColor = dominantColor,
+//                            pokemonName = pokemonName?.toLowerCase(Locale.KOREA) ?: "",
+//                            navController = navController
+//                        )
                     }
                 }
             }
@@ -124,73 +134,11 @@ class MainActivity : ComponentActivity() {
     }
 
 
-}
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        PokedexTheme {
 
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun CustomItem(
-    pokemon: com.plcoding.jetpackcomposepokedex.data.remote.responses.Result,
-    modifier: Modifier
-) {
-    Row(
-        modifier = Modifier
-            .background(Color.LightGray)
-            .fillMaxWidth()
-            .padding(24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = "${pokemon.name}",
-            color = Color.Black,
-            fontSize = 50.sp,
-            fontWeight = FontWeight.Bold
-        )
-        GlideImage(
-            model = pokemon.url,
-            contentDescription = "loadingImage",
-            modifier = modifier.fillMaxWidth()
-        ) {
-            it.error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_background)
-                .load(pokemon.url)
         }
-
-
-    }
-}
-
-
-//@Composable
-//@Preview
-//fun CustomItemPreview() {
-//    CustomItem(
-//        result = Result(
-//            name = 0,
-//            src = "John",
-//        )
-//    )
-//}
-
-
-@SuppressLint("StateFlowValueCalledInComposition")
-@Composable
-fun Greeting(viewModel: MainViewModel) {
-    var pokemonList  = viewModel.pokemonsState.value.data?.results
-    Log.d("check pokemonList =", pokemonList.toString())
-    LazyColumn {
-        items(pokemonList?.size?.minus(1) ?: 0) { it ->
-            pokemonList?.get(it)?.let { it1 -> CustomItem(pokemon = it1, modifier = Modifier) }
-        }
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PokedexTheme {
-
     }
 }

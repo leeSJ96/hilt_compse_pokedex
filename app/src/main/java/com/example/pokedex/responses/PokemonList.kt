@@ -1,9 +1,5 @@
 package com.plcoding.jetpackcomposepokedex.data.remote.responses
 
-import android.os.Parcel
-import android.os.Parcelable
-import androidx.annotation.Keep
-import com.example.pokedex.PokeData
 import com.google.gson.annotations.SerializedName
 
 
