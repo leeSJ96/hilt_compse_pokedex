@@ -3,7 +3,6 @@ package com.example.pokedex
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette
+import com.example.pokedex.util.PAGE_SIZE
 import com.example.pokedex.util.Resource
+import com.plcoding.jetpackcomposepokedex.data.remote.responses.Pokemon
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -113,13 +114,21 @@ class MainViewModel @Inject constructor(
                             entry.url.takeLastWhile { it.isDigit() }
                         }
                         val url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png"
-                        PokedexListEntry(entry.name.capitalize(Locale.ROOT), number.toInt(),url )
+                        Log.d("포켓몬 name = ", "${entry.name.capitalize(Locale.KOREA)}")
+
+                        Log.d("포켓몬 number = ", "${number.toInt()}")
+                        Log.d("포켓몬 url = ", "${url}")
+                        PokedexListEntry(entry.name.capitalize(Locale.KOREA), number.toInt(),url )
+
+
                     }
+
                     curPage++
 
                     loadError.value = ""
                     isLoading.value = false
                     pokemonList.value += pokedexEntries
+
                 }
                 is Resource.Error -> {
                     loadError.value = result.message!!

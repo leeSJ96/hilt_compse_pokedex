@@ -1,6 +1,7 @@
 package com.example.pokedex
 
 import android.provider.SyncStateContract
+import android.util.Log
 import com.example.pokedex.util.LIMIT_POKEMONS
 import com.example.pokedex.util.Resource
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.Pokemon
@@ -20,16 +21,23 @@ class PokeRepository @Inject constructor(
 
     suspend fun getPokemonList(limit: Int, offset: Int): Resource<PokemonList> {
         val response = try {
+            Log.d("포켓몬 = ", "${limit}")
+            Log.d("포켓몬 = ", "${offset}")
             api.getPokemonList(limit, offset)
+
         } catch(e: Exception) {
+            Log.d("포켓몬 = ", "${e}")
             return Resource.Error("An unknown error occured.")
         }
+        Log.d("포켓몬 = ", "${response}")
         return Resource.Success(response)
+
     }
 
     suspend fun getPokemonInfo(pokemonName: String): Resource<Pokemon> {
         val response = try {
             api.getPokemonInfo(pokemonName)
+
         } catch(e: Exception) {
             return Resource.Error("An unknown error occured.")
         }

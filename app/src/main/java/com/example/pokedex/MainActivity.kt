@@ -69,12 +69,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.request.ImageRequest
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-
 import com.example.pokedex.ui.theme.PokedexTheme
 import com.example.pokedex.util.Resource
-import com.google.accompanist.coil.CoilImage
+
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.Pokemon
 import com.plcoding.jetpackcomposepokedex.data.remote.responses.PokemonList
 import dagger.hilt.android.AndroidEntryPoint
